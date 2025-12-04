@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_12_03_144236) do
+ActiveRecord::Schema[7.1].define(version: 2025_12_04_213018) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -21,7 +21,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_12_03_144236) do
     t.bigint "workout_plan_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.bigint "chat_id", null: false
+    t.bigint "chat_id"
     t.index ["chat_id"], name: "index_ai_messages_on_chat_id"
     t.index ["user_id"], name: "index_ai_messages_on_user_id"
     t.index ["workout_plan_id"], name: "index_ai_messages_on_workout_plan_id"
@@ -58,6 +58,13 @@ ActiveRecord::Schema[7.1].define(version: 2025_12_03_144236) do
     t.bigint "workout_plan_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "exercise_type", default: "strength", null: false
+    t.integer "sets", default: 3, null: false
+    t.decimal "weight_lbs", precision: 5, scale: 1
+    t.text "notes"
+    t.integer "reps"
+    t.integer "duration_seconds"
+    t.index ["workout_plan_id", "step_order"], name: "index_workout_exercises_on_plan_and_step_order", unique: true
     t.index ["workout_plan_id"], name: "index_workout_exercises_on_workout_plan_id"
   end
 
