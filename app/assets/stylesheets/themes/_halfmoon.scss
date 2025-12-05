@@ -1,0 +1,53 @@
+// Halfmoon-inspired theme variables and base styles
+// Light and dark theme support via [data-theme="dark"] on <html>
+
+// Color tokens (fall back to existing config variables if present)
+$primary:    #0d6efd;
+$muted:      #6c757d;
+$bg-light:   #ffffff;
+$bg-dark:    #0f1720;
+$surface:    #f8f9fa;
+$accent:     #1edd88;
+
+html[data-theme="light"] {
+  --bg: #ffffff;
+  --surface: #f8f9fa;
+  --text: #0e0000;
+  --muted: #6c757d;
+  --primary: #0d6efd;
+  --accent: #1edd88;
+}
+
+html[data-theme="dark"] {
+  --bg: #0b1220;
+  --surface: #0f1720;
+  --text: #e6eef8;
+  --muted: #9aa6b2;
+  --primary: #4ea8ff;
+  --accent: #34d399;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+}
+
+.card {
+  background: var(--surface);
+  color: var(--text);
+}
+
+.btn-theme {
+  background: var(--primary);
+  color: #fff;
+  border: none;
+}
+
+.btn-outline-theme {
+  background: transparent;
+  color: var(--primary);
+  border: 1px solid rgba(13,110,253,0.15);
+}
+
+/* Simple container styling to match Halfmoon-like spacing */
+.landing-hero { padding: 3rem 1rem; }

@@ -1,0 +1,96 @@
+<div data-controller="diff-highlight">
+  <h3 class="mb-2">AI Revision Preview</h3>
+
+  <div class="row g-3">
+    <div class="col-12">
+      <div class="card p-3">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <strong>Overview</strong>
+          <label class="form-check form-check-inline">
+            <input class="form-check-input" type="checkbox" name="apply_overview" value="1" checked data-diff-target="toggle" />
+            <span class="form-check-label small">Apply</span>
+          </label>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6">
+            <label class="small text-muted">Current</label>
+            <div class="border p-2" data-diff-original><%= simple_format(preview[:original_overview]) %></div>
+          </div>
+          <div class="col-md-6">
+            <label class="small text-muted">Proposed</label>
+            <div class="border p-2 bg-light" data-diff-proposed><%= simple_format(preview[:proposed_overview]) %></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <% if preview[:revision_suggestions].present? %>
+      <div class="col-12">
+        <div class="card p-3">
+          <strong>AI Suggestions</strong>
+          <ul class="mt-2 mb-0">
+            <% preview[:revision_suggestions].each do |s| %>
+              <li><%= s %></li>
+            <% end %>
+          </ul>
+        </div>
+      </div>
+    <% end %>
+
+    <% if preview[:updated_exercises].present? %>
+      <div class="col-12">
+        <div class="card p-3">
+          <div class="d-flex justify-content-between align-items-start mb-2">
+            <strong>Exercise Updates</strong>
+            <small class="text-muted">Select which exercises to apply</small>
+          </div>
+
+          <div class="table-responsive">
+            <table class="table table-sm align-middle">
+              <thead>
+                <tr>
+                  <th></th>
+                  <th>Step</th>
+                  <th>Name</th>
+                  <th>Type</th>
+                  <th>Sets</th>
+                  <th>Reps</th>
+                  <th>Duration</th>
+                  <th>Weight</th>
+                  <th>Rest</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% preview[:updated_exercises].each_with_index do |ex, idx| %>
+                  <tr class="align-middle">
+                    <td>
+                      <input type="checkbox" name="apply_exercises[]" value="<%= idx %>" checked />
+                    </td>
+                    <td><%= ex['step_order'] || '-' %></td>
+                    <td><%= ex['name'] %></td>
+                    <td><%= ex['exercise_type'] %></td>
+                    <td><%= ex['sets'] %></td>
+                    <td><%= ex['reps'] %></td>
+                    <td><%= ex['duration_seconds'] %></td>
+                    <td><%= ex['weight_lbs'] %></td>
+                    <td><%= ex['rest_seconds'] %></td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
+    <div class="col-12 d-flex gap-2">
+      <%= form_with url: apply_revision_workout_plan_chat_path(workout_plan, chat), method: :post, data: { turbo_frame: "plan_revision_preview" } do |f| %>
+        <%= hidden_field_tag :proposed_overview, preview[:proposed_overview] %>
+        <%= hidden_field_tag :proposed_exercises_json, preview[:updated_exercises].to_json if preview[:updated_exercises].present? %>
+        <%= submit_tag "Apply Selected Changes", class: "btn btn-primary", data: { confirm: "Apply selected AI changes to this plan?" } %>
+        <%= link_to "Discard", workout_plan_chat_path(workout_plan, chat), class: "btn btn-secondary ms-2" %>
+      <% end %>
+    </div>
+  </div>
+</div>

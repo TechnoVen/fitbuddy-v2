@@ -1,0 +1,16 @@
+/* Shared button styles for the app (imported from components index) */
+.btn { 
+  border-radius: 0.375rem;
+  padding: 0.55rem 0.85rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-lg { font-size: 1.05rem; padding: 0.7rem 1.05rem; }
+
+.btn-primary { @extend .btn; background: var(--primary); color: #fff; }
+.btn-outline-secondary { @extend .btn; background: transparent; border: 1px solid rgba(0,0,0,0.08); }
+
+.btn-ghost { background: transparent; border: none; color: var(--text); }

@@ -11,6 +11,7 @@ Rails.application.routes.draw do
   resources :workout_plans do
     resources :chats, only: [:show, :create] do
       post 'revise_plan', on: :member
+      post 'apply_revision', on: :member
       resources :ai_messages, only: [:create]
     end
 

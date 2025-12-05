@@ -56,9 +56,17 @@
             <%= button_to "🤖 Revise My Plan", 
                 revise_plan_workout_plan_chat_path(@workout_plan, @chat),
                 method: :post,
-                class: "btn btn-outline-primary btn-sm w-100" %>
+                class: "btn btn-outline-primary btn-sm w-100",
+                data: { turbo_frame: "plan_revision_preview" } %>
           <% end %>
         </div>
+      </div>
+
+      <!-- Inline preview frame: Turbo will replace this when revise_plan is invoked -->
+      <div class="mt-3">
+        <%= turbo_frame_tag "plan_revision_preview" do %>
+          <!-- preview will be loaded here -->
+        <% end %>
       </div>
 
       <div class="mt-3">
