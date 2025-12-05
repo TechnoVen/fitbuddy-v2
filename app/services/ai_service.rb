@@ -131,11 +131,10 @@ class AIService
   # @return [String] The response text
   def call_ai(prompt)
     timeout_seconds = 30
-
-    messages = build_chat_messages(prompt)
-
-    # If the client supports a with_instructions style wrapper, prefer that
+    # When the client supports `with_instructions`, pass the system prompt via that wrapper
+    # and do NOT include the system prompt in the messages payload to avoid duplication.
     if @client.respond_to?(:with_instructions)
+      messages = build_chat_messages(prompt, include_system: false)
       response = @client.with_instructions(AIConfig.system_prompt) do |c|
         c.chat_completion(
           model: "gpt-4o-mini",
@@ -146,6 +145,8 @@ class AIService
         )
       end
     else
+      # Fallback: include system prompt as the first message when with_instructions isn't available
+      messages = build_chat_messages(prompt, include_system: true)
       response = @client.chat_completion(
         model: "gpt-4o-mini",
         messages: messages,
@@ -177,14 +178,18 @@ class AIService
 
   # Build the messages payload for chat completion ensuring the system prompt
   # is always included from configuration.
-  def build_chat_messages(prompt)
-    # Prefer configured system prompt; fall back to a detailed environment-aware default.
-    system_text = AIConfig.system_prompt.presence || default_system_prompt(Rails.env)
+  # Build the messages payload for chat completion. If `include_system` is true then
+  # the system prompt will be included as the first message; otherwise only user content
+  # is returned (useful when with_instructions is used to pass system instructions).
+  def build_chat_messages(prompt, include_system: true)
+    messages = []
+    if include_system
+      system_text = AIConfig.system_prompt.presence || default_system_prompt(Rails.env)
+      messages << { role: "system", content: system_text }
+    end
 
-    [
-      { role: "system", content: system_text },
-      { role: "user", content: prompt }
-    ]
+    messages << { role: "user", content: prompt }
+    messages
   end
 
   def default_system_prompt(env)

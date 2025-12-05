@@ -5,51 +5,60 @@
 - Last saved: 2025-12-05
 
 ## How to use
+
 - This file mirrors the in-memory tracked TODO list used by the assistant.
 - Update it manually or ask the assistant to update and persist changes.
 
-## Tasks
+## Tasks (clean, deduplicated)
 
 - [ ] Run test suite
+
   - Execute full Rails test suite locally to confirm current passing state and identify failing tests.
   - Commands: `bin/rails test` and `bundle exec rspec` (if present)
 
-- [ ] Stabilize AI integration
-  - Replace direct `RubyLLM.chat` calls with `AIService` wrapper in `app/controllers/ai_messages_controller.rb`.
-  - Add exponential backoff, clearer user-facing errors, and queue failed requests for background retry (Sidekiq/ActiveJob).
-  - Files: `app/controllers/ai_messages_controller.rb`, `app/services/ai_service.rb`, add `app/models/ai_request.rb`, `app/jobs/retry_ai_request_job.rb`.
+- [ ] Stabilize AI integration & enforce `with_instructions`
 
-- [ ] Verify & tighten `WorkoutExercise` model validations
-  - Ensure `step_order` uniqueness scoped to `workout_plan_id`, numeric bounds for `reps`/`duration_seconds`/`sets`/`weight_lbs`, presence validations, and tests.
-  - Files: `app/models/workout_exercise.rb`, `test/models/workout_exercise_test.rb`.
+  - Ensure every AI API call uses `with_instructions(system_prompt)` when supported by the LLM client.
+  - Avoid duplicating the system prompt in the messages array when using `with_instructions`.
+  - Replace any direct `RubyLLM.chat` usage in controllers with `AIService` calls.
+  - Files: `app/services/ai_service.rb`, `app/controllers/ai_messages_controller.rb`, `app/controllers/workout_plans_controller.rb` (revise flow).
 
-- [ ] Implement dynamic Exercise form UI
-  - Show/hide fields based on `exercise_type` (strength/cardio/flexibility).
-  - Create Stimulus controller `app/javascript/controllers/exercise_form_controller.js` and update `app/views/workout_exercises/_form.html.erb`.
+- [ ] Improve AI system prompt and persona
 
-- [ ] Add Workout execution & logging MVP
-  - Create `Workout` and `WorkoutLog` models, controllers and basic views to start and log workouts with timers and quick inputs.
-  - Files: `app/models/workout.rb`, `app/models/workout_log.rb`, `app/controllers/workouts_controller.rb`, `app/controllers/workout_logs_controller.rb`.
+  - Expand `config/ai.yml` system prompt to include persona, safety rules, clarifying questions, and structured output guidance.
+  - Ensure `AIConfig.system_prompt` returns the configured prompt.
 
-- [ ] Onboarding flow & plan templates
-  - Build 3-4 step onboarding (`PagesController#onboarding`) and `PlanTemplate` model with seed templates.
-  - Files: `app/controllers/pages_controller.rb`, `app/models/plan_template.rb`, `db/seeds.rb`.
+- [ ] AI-Powered Workout Generator (spec → implementation)
 
-- [ ] Equipment model & plan/equipment validation
-  - Add `Equipment` model and join table `workout_plans_equipment`. Enforce exercises cannot require missing equipment.
+  - Data collection: age, sex, weight, height, fitness goals, exercise preferences, workout history, health considerations.
+  - Data analysis & personalization: recommend exercises, sets/reps/duration, progression and alternatives for equipment levels.
+  - Adaptability: feedback loop to refine plans based on completed workouts and performance metrics.
+  - Integration points: wearable data, external apps (optional).
+  - Files: `app/services/workout_generator_service.rb` (new), updates to `app/services/ai_service.rb`, migrations for user fields, and UI pages for input.
 
-- [ ] Plan revision UI & multi-chat
-  - Expose 'Revise Plan' button, implement plan revision flow using `AIService.revise_plan`, and support multiple `Chat` topics per plan.
+- [ ] Modernize frontend UI
 
-- [ ] Monitoring, rate-limiting, and API cost tracking
-  - Add tracking for AI request counts per user and rate-limiting (e.g., 50 AI requests/day). Add admin view or logs for API usage and costs.
+  - Refresh layout and stylesheets; evaluate Tailwind or Bootstrap adoption.
+  - Improve mobile responsiveness and visual polish for core flows (plan creation, workout execution, chat).
+  - Files: `app/views/layouts/application.html.erb`, main CSS/SCSS, `app/javascript/controllers/*`.
+
+- [ ] Continue Phase 1 feature work
+
+  - Verify & tighten `WorkoutExercise` model validations and tests.
+  - Implement dynamic Exercise form UI (Stimulus controller).
+  - Add Workout execution & logging MVP (models/controllers/views/migrations already scaffolded in local WIP).
+  - Onboarding flow & plan templates, Equipment model, Plan revision UI & multi-chat.
+
+- [ ] Monitoring & rate-limiting
+
+  - Track AI usage per user and enforce quotas (e.g., 50/day) with user-facing counters and admin dashboard.
 
 - [x] Pull updates from team repo
-  - Fetch latest commits and rebase the current feature branch (`feature/phase-1.3-ai-service`) from `origin`. (Completed)
+
+  - Merged `team/master` into local `feature/phase-1.3-ai-service` and resolved conflicts. (Completed)
 
 - [x] Persist TODO list to file
   - This file was generated by the assistant to persist the tracked todo list. (Completed)
-
 
 ---
 
