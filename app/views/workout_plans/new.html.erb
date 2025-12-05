@@ -6,6 +6,26 @@
 
       <%= form_with model: @workout_plan, local: true do |f| %>
         <div class="mb-3">
+          <%= f.label :age, class: "form-label" %>
+          <%= f.number_field :age, class: "form-control", min: 1, max: 120, placeholder: "e.g. 25" %>
+        </div>
+
+        <div class="mb-3">
+          <%= f.label :height, "Height (cm)", class: "form-label" %>
+          <%= f.number_field :height, class: "form-control", min: 50, max: 250, placeholder: "e.g. 175" %>
+        </div>
+
+        <div class="mb-3">
+          <%= f.label :weight, "Weight (kg)", class: "form-label" %>
+          <%= f.number_field :weight, class: "form-control", min: 20, max: 300, placeholder: "e.g. 70" %>
+        </div>
+
+        <div class="mb-3">
+          <%= f.label :handicap, class: "form-label" %>
+          <%= f.text_field :handicap, class: "form-control", placeholder: "e.g. Knee injury, back pain, none" %>
+        </div>
+
+        <div class="mb-3">
           <%= f.label :goal, class: "form-label" %>
           <%= f.text_field :goal, class: "form-control", placeholder: "e.g. Fat loss, Strength, Mobility", required: true %>
         </div>
@@ -21,7 +41,7 @@
 
         <div class="mb-3">
           <%= f.label :duration_minutes, "Duration (minutes)", class: "form-label" %>
-          <%= f.number_field :duration_minutes, class: "form-control", min: 5, step: 5 %>
+          <%= f.number_field :duration_minutes, class: "form-control", min: 5, placeholder: "min 5 minutes" %>
         </div>
 
         <div class="mb-3">

@@ -26,12 +26,17 @@ class ChatsController < ApplicationController
 
     # Generate revised plan based on conversation
     prompt = <<~TEXT
-      You are a workout planning assistant. Review this conversation and create an improved workout plan.
+    You are a workout planning assistant. Review this conversation and create an improved workout plan.
 
-      Original Plan:
-      #{@workout_plan.ai_plan || 'No plan yet'}
+    Original Plan:
+    #{@workout_plan.ai_plan || "No plan yet"}
 
-      Goal: #{@workout_plan.goal}
+    Personal Information:
+    - Age: #{@workout_plan.age.present? ? @workout_plan.age : 'Not specified'}
+    - Height: #{@workout_plan.height.present? ? "#{@workout_plan.height} cm" : 'Not specified'}
+    - Weight: #{@workout_plan.weight.present? ? "#{@workout_plan.weight} kg" : 'Not specified'}
+    - Handicap: #{@workout_plan.handicap.present? ? @workout_plan.handicap : 'None'}
+
       Level: #{@workout_plan.level}
       Duration: #{@workout_plan.duration_minutes} minutes
       Equipment: #{@workout_plan.equipment || 'None'}

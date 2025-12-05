@@ -21,6 +21,18 @@
           <h5 class="mb-0">Plan Details</h5>
         </div>
         <div class="card-body">
+          <% if @workout_plan.age.present? %>
+            <p><strong>Age:</strong> <%= @workout_plan.age %> years</p>
+          <% end %>
+          <% if @workout_plan.height.present? %>
+            <p><strong>Height:</strong> <%= @workout_plan.height %> cm</p>
+          <% end %>
+          <% if @workout_plan.weight.present? %>
+            <p><strong>Weight:</strong> <%= @workout_plan.weight %> kg</p>
+          <% end %>
+          <% if @workout_plan.handicap.present? %>
+            <p><strong>Handicap:</strong> <%= @workout_plan.handicap %></p>
+          <% end %>
           <p><strong>Goal:</strong> <%= @workout_plan.goal %></p>
           <p><strong>Level:</strong> <%= @workout_plan.level %></p>
           <p><strong>Duration:</strong> <%= @workout_plan.duration_minutes %> minutes</p>
@@ -46,7 +58,7 @@
       <!-- Exercises Section -->
       <div class="card mb-4">
         <div class="card-header bg-light d-flex justify-content-between align-items-center">
-          <h5 class="mb-0">Exercises (<%= @workout_plan.workout_exercises.count %>)</h5>
+          <h5 class="mb-0">Manually Added Exercises (<%= @workout_plan.workout_exercises.count %>)</h5>
           <%= link_to "+ Add Exercise", new_workout_plan_workout_exercise_path(@workout_plan), class: "btn btn-sm btn-primary" %>
         </div>
         <% if @workout_plan.workout_exercises.any? %>
