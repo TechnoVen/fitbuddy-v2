@@ -1,4 +1,4 @@
-<%= form_with model: [@workout_plan, @workout_exercise], local: true do |f| %>
+<%= form_with model: [@workout_plan, @workout_exercise], local: true, data: { controller: "exercise-form" } do |f| %>
   <div class="mb-3">
     <%= f.label :step_order, class: "form-label" %>
     <%= f.number_field :step_order, class: "form-control", min: 1 %>
@@ -9,19 +9,120 @@
     <%= f.text_field :name, class: "form-control", required: true %>
   </div>
 
+  <!-- Exercise Type Selector -->
   <div class="mb-3">
-    <%= f.label :description, class: "form-label" %>
-    <%= f.text_area :description, class: "form-control", rows: 4 %>
+    <%= f.label :exercise_type, "Exercise Type", class: "form-label" %>
+    <div class="help-text small text-muted mb-2">
+      <small>Choose the type of exercise to display relevant fields</small>
+    </div>
+    <%= f.select :exercise_type, 
+        { "Strength" => "strength", "Cardio" => "cardio", "Flexibility" => "flexibility" }, 
+        { prompt: "Select exercise type", include_blank: false },
+        class: "form-select",
+        data: { 
+          "exercise-form-target" => "typeSelector",
+          "action" => "change->exercise-form#updateFields"
+        }
+    %>
   </div>
 
-  <div class="row">
-    <div class="col-md-6 mb-3">
-      <%= f.label :reps_or_duration, "Reps / Duration", class: "form-label" %>
-      <%= f.text_field :reps_or_duration, class: "form-control" %>
+  <div class="mb-3">
+    <%= f.label :description, class: "form-label" %>
+    <%= f.text_area :description, class: "form-control", rows: 4, placeholder: "Add exercise description and tips" %>
+  </div>
+
+  <!-- Strength Exercise Fields -->
+  <div data-exercise-form-target="strengthFields" class="strength-fields" style="display: none;">
+    <div class="card mb-3 border-info">
+      <div class="card-header bg-info bg-opacity-10">
+        <strong>Strength Exercise Details</strong>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-4 mb-3">
+            <%= f.label :reps, "Reps", class: "form-label" %>
+            <div class="help-text small text-muted mb-2">
+              <small>Number of repetitions (1-1000)</small>
+            </div>
+            <%= f.number_field :reps, class: "form-control", min: 1, max: 1000, placeholder: "e.g., 12" %>
+          </div>
+          <div class="col-md-4 mb-3">
+            <%= f.label :sets, "Sets", class: "form-label" %>
+            <div class="help-text small text-muted mb-2">
+              <small>Number of sets (1-10)</small>
+            </div>
+            <%= f.number_field :sets, class: "form-control", min: 1, max: 10, placeholder: "e.g., 3" %>
+          </div>
+          <div class="col-md-4 mb-3">
+            <%= f.label :weight_lbs, "Weight (lbs)", class: "form-label" %>
+            <div class="help-text small text-muted mb-2">
+              <small>Weight in pounds (1-500)</small>
+            </div>
+            <%= f.number_field :weight_lbs, class: "form-control", min: 1, max: 500, step: 0.5, placeholder: "e.g., 25" %>
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="col-md-6 mb-3">
-      <%= f.label :rest_seconds, class: "form-label" %>
-      <%= f.number_field :rest_seconds, class: "form-control", min: 0 %>
+  </div>
+
+  <!-- Cardio Exercise Fields -->
+  <div data-exercise-form-target="cardioFields" class="cardio-fields" style="display: none;">
+    <div class="card mb-3 border-success">
+      <div class="card-header bg-success bg-opacity-10">
+        <strong>Cardio Exercise Details</strong>
+      </div>
+      <div class="card-body">
+        <div class="col-md-6">
+          <%= f.label :duration_seconds, "Duration (seconds)", class: "form-label" %>
+          <div class="help-text small text-muted mb-2">
+            <small>Exercise duration in seconds (1-3600)</small>
+          </div>
+          <%= f.number_field :duration_seconds, class: "form-control", min: 1, max: 3600, placeholder: "e.g., 300 (5 minutes)" %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Flexibility Exercise Fields -->
+  <div data-exercise-form-target="flexibilityFields" class="flexibility-fields" style="display: none;">
+    <div class="card mb-3 border-warning">
+      <div class="card-header bg-warning bg-opacity-10">
+        <strong>Flexibility Exercise Details</strong>
+      </div>
+      <div class="card-body">
+        <div class="col-md-6">
+          <%= f.label :duration_seconds, "Hold Duration (seconds)", class: "form-label" %>
+          <div class="help-text small text-muted mb-2">
+            <small>How long to hold the stretch (1-3600)</small>
+          </div>
+          <%= f.number_field :duration_seconds, class: "form-control", min: 1, max: 3600, placeholder: "e.g., 30 (30 seconds)" %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Common Fields for All Types -->
+  <div class="card mb-3 border-secondary">
+    <div class="card-header bg-secondary bg-opacity-10">
+      <strong>Recovery & Notes</strong>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <%= f.label :rest_seconds, "Rest Between Sets (seconds)", class: "form-label" %>
+          <div class="help-text small text-muted mb-2">
+            <small>Rest time in seconds (0-600)</small>
+          </div>
+          <%= f.number_field :rest_seconds, class: "form-control", min: 0, max: 600, placeholder: "e.g., 60" %>
+        </div>
+        <div class="col-md-6 mb-3">
+          <%= f.label :notes, class: "form-label" %>
+          <div class="help-text small text-muted mb-2">
+            <small>Additional notes or form cues</small>
+          </div>
+          <%= f.text_field :notes, class: "form-control", placeholder: "e.g., Keep back straight" %>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -33,8 +134,8 @@
     </div>
   <% end %>
 
-  <div class="d-flex justify-content-end">
-    <%= f.submit class: "btn btn-primary me-2" %>
+  <div class="d-flex justify-content-end gap-2">
+    <%= f.submit class: "btn btn-primary" %>
     <%= link_to "Cancel", workout_plan_path(@workout_plan), class: "btn btn-outline-secondary" %>
   </div>
 <% end %>

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>ChangeThisToYourRailsAppName</title>
+    <title>FitBuddyLite</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
@@ -11,6 +11,51 @@
   </head>
 
   <body>
+    <!-- Navbar/Header -->
+    <div class="navbar navbar-expand-sm navbar-light navbar-lewagon">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#">
+          <!-- Stylized 'F' logo, matching Le Wagon logo dimensions -->
+          <span style="display:inline-block;width:40px;height:40px;background:#fa2a2a;border-radius:8px;line-height:40px;text-align:center;font-size:1.7rem;font-weight:bold;color:#fff;font-family:sans-serif;">F</span>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav me-auto">
+              <li class="nav-item active">
+                <a class="nav-link" href="#">Home</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">Messages</a>
+              </li>
+              <li class="nav-item dropdown">
+                <img class="avatar dropdown-toggle" id="navbarDropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" src="https://kitt.lewagon.com/placeholder/users/ssaunier" />
+                <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                  <a class="dropdown-item" href="#">Action</a>
+                  <a class="dropdown-item" href="#">Another action</a>
+                  <a class="dropdown-item" data-turbo-method="delete" href="#">Log out</a>
+                </div>
+              </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
     <%= yield %>
+
+    <!-- Footer -->
+    <div class="footer" style="background:#f8f9fa;padding:20px 0;margin-top:40px;">
+      <div class="footer-links" style="text-align:center;margin-bottom:10px;">
+        <a href="#" style="margin:0 8px;"><i class="fab fa-github"></i></a>
+        <a href="#" style="margin:0 8px;"><i class="fab fa-instagram"></i></a>
+        <a href="#" style="margin:0 8px;"><i class="fab fa-facebook"></i></a>
+        <a href="#" style="margin:0 8px;"><i class="fab fa-twitter"></i></a>
+        <a href="#" style="margin:0 8px;"><i class="fab fa-linkedin"></i></a>
+      </div>
+      <div class="footer-copyright" style="text-align:center;color:#888;">
+        Copyright  FitBuddyLite 2025, Made with <i class="fas fa-heart" style="color:#fa2a2a;"></i> in EU
+      </div>
+    </div>
   </body>
 </html>
