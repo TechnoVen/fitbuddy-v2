@@ -16,8 +16,15 @@ class AIService
     @logger = Rails.logger
     
     raise AIServiceError, "OpenAI API key is not configured" if @api_key.blank?
-    
-    @client = RubyLLM::Client.new(api_key: @api_key)
+
+    begin
+      @client = RubyLLM::Client.new(api_key: @api_key)
+    rescue NameError, LoadError => e
+      # ruby_llm gem isn't available in the current environment (e.g., test runner).
+      # Fall back to a nil client and allow methods that don't call the API to run.
+      @logger.warn("AIService: ruby_llm not available, API calls will be disabled (#{e.class})")
+      @client = nil
+    end
   end
 
   # Enhance an exercise with AI suggestions
@@ -200,7 +207,13 @@ class AIService
       - Duration: #{plan.duration_minutes} minutes per session
       - Level: #{plan.level}
       - User Level: #{plan.level.titleize}
-      - Equipment Available: #{plan.equipment.present? ? plan.equipment.join(", ") : "None specified"}
+      - Equipment Available: #{
+        if plan.respond_to?(:equipment) && plan.equipment.present?
+          plan.equipment.is_a?(Array) ? plan.equipment.join(", ") : plan.equipment.to_s
+        else
+          "None specified"
+        end
+      }
 
       Create a realistic, structured workout plan with 4-8 exercises that:
       1. Progresses logically
