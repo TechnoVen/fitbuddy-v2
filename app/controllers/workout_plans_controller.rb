@@ -75,11 +75,11 @@ class WorkoutPlansController < ApplicationController
     PROMPT
 
     begin
-      chat = RubyLLM.chat
-      response = chat.ask(prompt)
-      response.content || "No AI plan generated."
-    rescue StandardError => e
-      Rails.logger.error "AI generation failed: #{e.message}"
+      ai_service = AIService.new
+      ai_text = ai_service.chat(prompt)
+      ai_text.presence || "No AI plan generated."
+    rescue AIService::AIServiceError, StandardError => e
+      Rails.logger.error "AI generation failed: #{e.class} - #{e.message}"
       "AI plan generation unavailable at this time."
     end
   end

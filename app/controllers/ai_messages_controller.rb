@@ -28,17 +28,10 @@ class AiMessagesController < ApplicationController
       User: #{user_message.content}
     TEXT
 
-    # 4) Get AI response with error handling
+    # 4) Get AI response via AIService with centralized error handling
     begin
-      chat_llm    = RubyLLM.chat
-      ai_response = chat_llm.ask(prompt)
-
-      ai_text =
-        if ai_response.respond_to?(:content)
-          ai_response.content.to_s        # Extract response text from RubyLLM
-        else
-          ai_response.to_s                # Fallback if API object changes
-        end
+      ai_service = AIService.new
+      ai_text = ai_service.chat(prompt)
 
       # 5) Save AI message
       @chat.ai_messages.create!(
@@ -50,8 +43,8 @@ class AiMessagesController < ApplicationController
 
       # 6) Redirect back to chat
       redirect_to workout_plan_chat_path(@workout_plan, @chat), notice: "AI response received."
-    rescue StandardError => e
-      Rails.logger.error "AI API Error: #{e.message}"
+    rescue AIService::AIServiceError, StandardError => e
+      Rails.logger.error "AI API Error: #{e.class} - #{e.message}"
       redirect_to workout_plan_chat_path(@workout_plan, @chat),
                   alert: "Sorry, the AI service is temporarily unavailable. Please try again later."
     end

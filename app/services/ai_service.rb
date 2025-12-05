@@ -93,6 +93,15 @@ class AIService
     }
   end
 
+  # Generic chat wrapper that returns the AI's text response for an arbitrary prompt.
+  # This centralizes retry behavior and ensures the system prompt is applied via
+  # `with_instructions` when the client supports it.
+  # @param prompt [String]
+  # @return [String]
+  def chat(prompt)
+    call_ai_with_retry(prompt, "chat")
+  end
+
   private
 
   # Call AI API with exponential backoff retry logic

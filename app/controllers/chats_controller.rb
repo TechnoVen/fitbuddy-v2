@@ -50,27 +50,39 @@ class ChatsController < ApplicationController
     TEXT
 
     begin
-      chat_llm = RubyLLM.chat
-      ai_response = chat_llm.ask(prompt)
-      new_plan = ai_response.respond_to?(:content) ? ai_response.content.to_s : ai_response.to_s
+      ai_service = AIService.new
 
-      # Update the workout plan
-      @workout_plan.update!(ai_plan: new_plan)
+      # Use the AIService.revise_plan which returns structured revision suggestions
+      result = ai_service.revise_plan(@workout_plan, @chat.ai_messages.order(:created_at).last(10).map { |m| { role: m.role, content: m.content } })
+
+      if result[:error]
+        raise AIService::AIServiceError, (result[:error_message] || "AI revision failed")
+      end
+
+      new_plan_text = if result[:revision_suggestions].present?
+                        # Prefer a human-readable join of suggestions if provided
+                        result[:revision_suggestions].join("\n")
+                      elsif result[:updated_exercises].present?
+                        "Updated exercises suggested by AI"
+                      else
+                        "AI produced a revision"
+                      end
+
+      # Update the workout plan with the AI-generated overview if available
+      @workout_plan.update!(ai_plan: new_plan_text)
 
       # Save AI message to chat history
       @chat.ai_messages.create!(
         user: current_user,
         workout_plan: @workout_plan,
         role: "assistant",
-        content: "✅ I've revised your workout plan based on our conversation:\n\n#{new_plan}"
+        content: "✅ I've revised your workout plan based on our conversation:\n\n#{new_plan_text}"
       )
 
-      redirect_to workout_plan_chat_path(@workout_plan, @chat),
-                  notice: "Workout plan successfully updated!"
-    rescue StandardError => e
-      Rails.logger.error "Plan revision failed: #{e.message}"
-      redirect_to workout_plan_chat_path(@workout_plan, @chat),
-                  alert: "Sorry, I couldn't revise the plan right now. Please try again."
+      redirect_to workout_plan_chat_path(@workout_plan, @chat), notice: "Workout plan successfully updated!"
+    rescue AIService::AIServiceError, StandardError => e
+      Rails.logger.error "Plan revision failed: #{e.class} - #{e.message}"
+      redirect_to workout_plan_chat_path(@workout_plan, @chat), alert: "Sorry, I couldn't revise the plan right now. Please try again."
     end
   end
 
