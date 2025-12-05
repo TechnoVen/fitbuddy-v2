@@ -9,6 +9,38 @@
 - This file mirrors the in-memory tracked TODO list used by the assistant.
 - Update it manually or ask the assistant to update and persist changes.
 
+## Team remote and workflow (persistent)
+
+- Team repository: `https://github.com/rtugit/fitbuddylite` (git remote name: `team`)
+- My repository (origin): `https://github.com/TechnoVen/fitbuddylite-v2` (git remote name: `origin`)
+- Workflow notes:
+  - Always `git fetch team --prune` and review incoming branches before merging.
+  - Create a local WIP branch to save uncommitted changes before merging team updates.
+  - Merge or rebase team branches into your working feature branch, resolve conflicts conservatively.
+  - After verifying tests locally, push your merged work to `origin`.
+  - Example commands:
+
+```bash
+# configure the team remote (idempotent)
+git remote set-url team https://github.com/rtugit/fitbuddylite.git
+git fetch team --prune
+
+# save WIP work
+git checkout -b wip/save-local-changes
+git add -A && git commit -m "WIP: save local changes before pulling from team"
+
+# merge team homepage branch into your feature branch
+git checkout feature/phase-1.3-ai-service
+git merge --no-ff team/feature/13-hompage-ui
+
+# run tests
+bin/rails db:migrate
+bin/rails test -v --backtrace
+
+# push to your origin only after verifying tests
+git push origin feature/phase-1.3-ai-service
+```
+
 ## Tasks (clean, deduplicated)
 
 - [ ] Run test suite
