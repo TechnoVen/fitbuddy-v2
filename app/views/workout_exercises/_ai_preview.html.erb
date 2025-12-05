@@ -1,0 +1,29 @@
+<%# AI suggestion preview partial - shows suggestion, form tips, and proposed values %>
+<div class="card mb-3 border-primary">
+  <div class="card-header bg-primary bg-opacity-10">
+    <strong>AI Suggestions</strong>
+  </div>
+  <div class="card-body">
+    <p><strong>Suggestion:</strong> <%= @ai_result[:suggestion] || @ai_result['suggestion'] %></p>
+    <p><strong>Form Tips:</strong> <%= @ai_result[:form_tips] || @ai_result['form_tips'] %></p>
+
+    <% enhanced = @ai_result[:enhanced_fields] || @ai_result['enhanced_fields'] || {} %>
+    <% if enhanced.present? %>
+      <h6>Recommended Values</h6>
+      <ul>
+        <% enhanced.each do |k, v| %>
+          <li><strong><%= k %>:</strong> <%= v %></li>
+        <% end %>
+      </ul>
+    <% end %>
+
+    <div class="d-flex gap-2">
+      <%= form_with url: workout_plan_workout_exercise_path(@workout_plan, @workout_exercise), method: :patch, local: true do |f| %>
+        <%= hidden_field_tag :ai_accept, "1" %>
+        <%= submit_tag "Apply suggestion", class: "btn btn-success" %>
+      <% end %>
+
+      <%= link_to "Dismiss", edit_workout_plan_workout_exercise_path(@workout_plan, @workout_exercise), class: "btn btn-outline-secondary" %>
+    </div>
+  </div>
+</div>

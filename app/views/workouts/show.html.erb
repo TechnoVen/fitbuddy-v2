@@ -1,0 +1,40 @@
+<div class="container py-4">
+  <div class="row">
+    <div class="col-md-10 offset-md-1">
+      <h2>Workout #<%= @workout.id %> — <%= @workout_plan.goal %></h2>
+      <p>
+        <strong>Started:</strong> <%= l(@workout.started_at || @workout.created_at, format: :long) %>
+        <% if @workout.completed_at.present? %>
+          — <strong>Completed:</strong> <%= l(@workout.completed_at, format: :long) %>
+        <% end %>
+      </p>
+
+      <% if @workout.notes.present? %>
+        <div class="mb-3">
+          <strong>Notes:</strong>
+          <div class="card p-2"><%= simple_format(@workout.notes) %></div>
+        </div>
+      <% end %>
+
+      <div class="mb-3">
+        <%= link_to "View Logs", workout_workout_logs_path(@workout), class: "btn btn-outline-primary" %>
+        <%= link_to "Add Log", new_workout_workout_log_path(@workout), class: "btn btn-primary ms-2" %>
+        <%= link_to "Back to Plan", workout_plan_path(@workout_plan), class: "btn btn-link ms-2" %>
+      </div>
+
+      <h4>Exercises in Plan</h4>
+      <% if @workout_plan.workout_exercises.any? %>
+        <ul class="list-group mb-4">
+          <% @workout_plan.workout_exercises.order(:step_order).each do |ex| %>
+            <li class="list-group-item">
+              <strong><%= ex.step_order %>. <%= ex.name %></strong>
+              <div class="small text-muted"><%= ex.exercise_type %> — <%= ex.description %></div>
+            </li>
+          <% end %>
+        </ul>
+      <% else %>
+        <p>No exercises found for this plan.</p>
+      <% end %>
+    </div>
+  </div>
+</div>

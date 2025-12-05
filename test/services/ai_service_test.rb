@@ -122,6 +122,45 @@ class AIServiceTest < ActiveSupport::TestCase
     assert_includes prompt, @plan.goal
   end
 
+  test "build_chat_messages includes configured system prompt" do
+    service = AIService.new
+    AIConfig.load_config # ensure config loaded
+    messages = service.send(:build_chat_messages, "Hello")
+
+    assert_equal "system", messages.first[:role]
+    assert_equal AIConfig.system_prompt.strip, messages.first[:content].strip
+    assert_equal "user", messages.last[:role]
+  end
+
+  test "calls client.with_instructions when available" do
+    service = AIService.new
+
+    # Build a fake client that responds to with_instructions and chat_completion
+    fake_client = Object.new
+
+    def fake_client.with_instructions(system_prompt)
+      @with_instructions_called = true
+      # yield a client-like object (self) that responds to chat_completion
+      yield self
+    end
+
+    def fake_client.chat_completion(**kwargs)
+      { "choices" => [{ "message" => { "content" => "FAKE_OK" } }] }
+    end
+
+    def fake_client.with_instructions_called?
+      !!@with_instructions_called
+    end
+
+    service.instance_variable_set(:@client, fake_client)
+
+    # call the private method to trigger the wrapper usage
+    result = service.send(:call_ai, "test prompt")
+
+    assert_equal "FAKE_OK", result
+    assert_predicate fake_client, :with_instructions_called?
+  end
+
   test "should build plan generation prompt with plan details" do
     service = AIService.new
     prompt = service.send(:build_plan_generation_prompt, @plan)

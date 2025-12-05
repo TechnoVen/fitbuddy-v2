@@ -1,0 +1,40 @@
+<div class="container py-4">
+  <h3>Record Log for Workout #<%= @workout.id %></h3>
+
+  <%= form_with model: [@workout, @workout_log], local: true do |f| %>
+    <div class="mb-3">
+      <%= f.label :workout_exercise_id, "Exercise (optional)", class: "form-label" %>
+      <%= f.collection_select :workout_exercise_id, @workout.workout_plan.workout_exercises.order(:step_order), :id, :name, { include_blank: true }, class: "form-select" %>
+    </div>
+
+    <div class="mb-3">
+      <%= f.label :reps, class: "form-label" %>
+      <%= f.number_field :reps, class: "form-control", min: 1 %>
+    </div>
+
+    <div class="mb-3">
+      <%= f.label :duration_seconds, "Duration (seconds)", class: "form-label" %>
+      <%= f.number_field :duration_seconds, class: "form-control", min: 1 %>
+    </div>
+
+    <div class="mb-3">
+      <%= f.label :weight_lbs, "Weight (lbs)", class: "form-label" %>
+      <%= f.number_field :weight_lbs, class: "form-control", step: 0.5 %>
+    </div>
+
+    <div class="mb-3">
+      <%= f.label :notes, class: "form-label" %>
+      <%= f.text_area :notes, class: "form-control", rows: 3 %>
+    </div>
+
+    <div class="form-check mb-3">
+      <%= f.check_box :completed, class: "form-check-input" %>
+      <%= f.label :completed, "Mark as completed", class: "form-check-label" %>
+    </div>
+
+    <div class="d-flex gap-2">
+      <%= f.submit "Save Log", class: "btn btn-primary" %>
+      <%= link_to "Back", workout_workout_logs_path(@workout), class: "btn btn-outline-secondary" %>
+    </div>
+  <% end %>
+</div>

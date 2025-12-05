@@ -6,10 +6,10 @@ class AiMessagesController < ApplicationController
   def create
     # 1) Save user message
     user_message = @chat.ai_messages.create!(
-      user:         current_user,
+      user: current_user,
       workout_plan: @workout_plan,
-      role:         "user",
-      content:      params.require(:ai_message).fetch(:content)
+      role: "user",
+      content: params.require(:ai_message).fetch(:content)
     )
 
     # 2) Build chat history as plain text
@@ -42,17 +42,17 @@ class AiMessagesController < ApplicationController
 
       # 5) Save AI message
       @chat.ai_messages.create!(
-        user:         current_user,
+        user: current_user,
         workout_plan: @workout_plan,
-        role:         "assistant",
-        content:      ai_text
+        role: "assistant",
+        content: ai_text
       )
 
       # 6) Redirect back to chat
       redirect_to workout_plan_chat_path(@workout_plan, @chat), notice: "AI response received."
     rescue StandardError => e
       Rails.logger.error "AI API Error: #{e.message}"
-      redirect_to workout_plan_chat_path(@workout_plan, @chat), 
+      redirect_to workout_plan_chat_path(@workout_plan, @chat),
                   alert: "Sorry, the AI service is temporarily unavailable. Please try again later."
     end
   end

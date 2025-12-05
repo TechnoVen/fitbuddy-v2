@@ -2,6 +2,11 @@
   <div class="row">
     <div class="col-md-8 offset-md-2">
       <h2>Edit Exercise for <%= @workout_plan.goal %></h2>
+      <%# Render AI preview when available (preview from last AI assist call) %>
+      <% if defined?(@ai_result) && @ai_result.present? %>
+        <%= render "ai_preview" %>
+      <% end %>
+
       <%= render "form", workout_plan: @workout_plan, workout_exercise: @workout_exercise %>
     </div>
   </div>

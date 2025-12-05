@@ -1,0 +1,28 @@
+<div class="container py-4">
+  <h3>Workout Logs for Workout #<%= @workout.id %></h3>
+
+  <div class="mb-3">
+    <%= link_to "Add Log", new_workout_workout_log_path(@workout), class: "btn btn-primary" %>
+  </div>
+
+  <% if @workout_logs.any? %>
+    <ul class="list-group">
+      <% @workout_logs.each do |log| %>
+        <li class="list-group-item">
+          <strong>Logged at:</strong> <%= l(log.created_at, format: :short) %>
+          <% if log.workout_exercise %>
+            — <strong>Exercise:</strong> <%= log.workout_exercise.name %>
+          <% end %>
+          <% if log.reps.present? %> — <strong>Reps:</strong> <%= log.reps %><% end %>
+          <% if log.duration_seconds.present? %> — <strong>Duration:</strong> <%= log.duration_seconds %>s<% end %>
+          <% if log.weight_lbs.present? %> — <strong>Weight:</strong> <%= log.weight_lbs %> lbs<% end %>
+          <% if log.notes.present? %>
+            <div class="mt-2"><em><%= log.notes %></em></div>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+  <% else %>
+    <p>No logs yet for this workout.</p>
+  <% end %>
+</div>

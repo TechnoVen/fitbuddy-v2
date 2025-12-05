@@ -15,6 +15,10 @@ Rails.application.routes.draw do
     end
 
     resources :workout_exercises, except: [:index, :show]
+
+    resources :workouts, only: [:index, :new, :create, :show] do
+      resources :workout_logs, only: [:index, :new, :create]
+    end
   end
 
   get "up" => "rails/health#show", as: :rails_health_check
