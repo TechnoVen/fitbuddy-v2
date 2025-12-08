@@ -2,125 +2,229 @@
 
 - Repository: `TechnoVen/fitbuddy-v2`
 - Branch: `feature/phase-1.3-ai-service`
-- Last saved: 2025-12-05
-- Latest action: pushed UI preview and Turbo Streams (2025-12-05)
+- Last saved: 2025-12-09
+- Latest action: Added Copilot instructions, AI audit task, completed theme system (2025-12-09)
 
-## How to use
+## Purpose
 
-- This file mirrors the in-memory tracked TODO list used by the assistant.
-- Update it manually or ask the assistant to update and persist changes.
+This file is the single source-of-truth for the assistant-managed TODOs. Use it as the memory snapshot for where we left off — the assistant will update it before ending each session so we can resume quickly later.
 
-## Team remote and workflow (persistent)
+## Quick status (what's done) ✅
 
-- Team repository: `https://github.com/rtugit/fitbuddylite` (git remote name: `team`)
-- My repository (origin): `https://github.com/TechnoVen/fitbuddylite-v2` (git remote name: `origin`)
-- Workflow notes:
-  - Always `git fetch team --prune` and review incoming branches before merging.
-  - Create a local WIP branch to save uncommitted changes before merging team updates.
-  - Merge or rebase team branches into your working feature branch, resolve conflicts conservatively.
-  - After verifying tests locally, push your merged work to `origin`.
-  - Example commands:
+- **Plan revision preview + apply flow** (Turbo Frame + Stimulus) — implemented and tested (`app/controllers/chats_controller.rb`, `app/views/chats/revise_plan_preview.html.erb`).
+- **AIService centralization** — AI calls moved to `app/services/ai_service.rb`. All controllers use `ai_service.chat()` pattern. Tests passing.
+- **AI audit task** — added `lib/tasks/ai_audit.rake` to detect direct RubyLLM usage. Run with `bin/rails ai:audit`.
+- **Copilot instructions** — comprehensive guide at `.github/copilot-instructions.md` documenting architecture, workflows, conventions, and pitfalls.
+- **Homepage redesign** — Halfmoon-inspired two-column layout at `app/views/pages/home.html.erb` (left: app info, right: demo chat panel).
+- **Theme system** — light/dark theme toggle with CSS variables (`app/assets/stylesheets/themes/_halfmoon.scss`), Stimulus controller (`theme_controller.js`), and button styles (`components/_buttons.scss`).
+- **Navbar updates** — wired to real routes (Home, Plans, Create Plan) with theme toggle button and conditional sign-in/sign-up links.
+- **Fixed bugs** — resolved `pages_home_path` error (replaced with `root_path`).
+- **Persisted TODO file** — this file kept up to date throughout development.
+- **All changes pushed** to `origin/feature/phase-1.3-ai-service`.
+
+## Next Priority Tasks 🎯
+
+### High Priority (Start Here)
+
+1. **Polish Homepage & Theme Components**
+   - Add responsive breakpoints and mobile-first styles
+   - Create form components (inputs, textareas, selects) in Halfmoon style
+   - Add modal/dialog patterns if needed
+   - Ensure accessibility (ARIA labels, keyboard navigation)
+   - Test on mobile devices
+   - **Files:** `app/assets/stylesheets/themes/_halfmoon.scss`, `components/_forms.scss` (new)
+
+2. **Improve AI System Prompt**
+   - Expand `config/ai.yml` with more specific persona guidelines
+   - Add safety rules and edge-case handling
+   - Document structured output formats (JSON schemas)
+   - Test prompt variations with real API calls
+   - **Files:** `config/ai.yml`, `test/services/ai_service_test.rb`
+
+3. **Run Full Test Suite & Fix Issues**
+   - Execute `bin/rails test -v` and address any failures
+   - Add missing controller tests for new features (theme, homepage, chat revisions)
+   - Test AI service error handling paths
+   - **Files:** `test/controllers/*_test.rb`, `test/services/ai_service_test.rb`
+
+### Medium Priority
+
+4. **WorkoutExercise Validations**
+   - Review existing validations in `app/models/workout_exercise.rb`
+   - Ensure `step_order` uniqueness per plan is enforced
+   - Add boundary tests for numeric fields
+   - **Status:** Most validations exist; needs review and possibly tightening
+
+5. **Dynamic Exercise Form UI**
+   - Create `exercise_form_controller.js` Stimulus controller
+   - Add conditional field visibility based on exercise type
+   - Enable add/remove exercise rows dynamically
+   - **Files:** `app/javascript/controllers/exercise_form_controller.js`, `app/views/workout_exercises/_form.html.erb`
+
+6. **Workout Execution & Logging MVP**
+   - Implement `Workout` and `WorkoutLog` models (already scaffolded)
+   - Create controllers and views for workout execution flow
+   - Add UI to start workout, log exercises, and mark complete
+   - **Files:** `app/models/workout.rb`, `app/models/workout_log.rb`, `app/controllers/workouts_controller.rb`
+
+### Lower Priority / Future
+
+7. **AI-Powered Workout Generator**
+   - Create `WorkoutGeneratorService` that takes user preferences
+   - Add user profile fields (age, fitness level, goals, equipment)
+   - Build UI for preference collection
+   - **Effort:** Large feature, requires design & iteration
+
+8. **Monitoring & Rate Limiting**
+   - Track AI API usage per user
+   - Add rate limits and quota enforcement
+   - Create admin dashboard for cost monitoring
+   - **Dependencies:** Requires Redis or similar for rate limiting
+
+9. **Onboarding Flow & Templates**
+   - Create `PlanTemplate` model with seed data
+   - Build multi-step onboarding wizard
+   - Allow users to start from template or create custom
+   - **Files:** New migrations, models, controllers, views
+
+10. **Equipment Model & Validation**
+    - Create `Equipment` model and join table
+    - Validate plans against user's available equipment
+    - Suggest alternatives when equipment is missing
+    - **Files:** New migrations, `app/models/equipment.rb`
+
+## Blockers & Notes
+
+- Frontend assets (new Stimulus controllers and SCSS) require a dev server restart and full browser refresh to load in development. If you see missing behavior, restart server and clear cache.
+- Some AI behavior changes require coordinated deployment and API key configuration in production (check `ENV` and `config/credentials`).
+
+## How to resume tomorrow (quick checklist)
+
+1. Pull latest branch & ensure clean working directory:
 
 ```bash
-# configure the team remote (idempotent)
-git remote set-url team https://github.com/rtugit/fitbuddylite.git
-git fetch team --prune
-
-# save WIP work
-git checkout -b wip/save-local-changes
-git add -A && git commit -m "WIP: save local changes before pulling from team"
-
-# merge team homepage branch into your feature branch
 git checkout feature/phase-1.3-ai-service
-git merge --no-ff team/feature/13-hompage-ui
-
-# run tests
-bin/rails db:migrate
-bin/rails test -v --backtrace
-
-# push to your origin only after verifying tests
-git push origin feature/phase-1.3-ai-service
+git pull origin feature/phase-1.3-ai-service
 ```
 
-## Tasks (clean, deduplicated)
-
-- [ ] Run test suite
-
-  - Execute full Rails test suite locally to confirm current passing state and identify failing tests.
-  - Commands: `bin/rails test` and `bundle exec rspec` (if present)
-
-- [ ] Stabilize AI integration & enforce `with_instructions`
-
-  - Ensure every AI API call uses `with_instructions(system_prompt)` when supported by the LLM client.
-  - Avoid duplicating the system prompt in the messages array when using `with_instructions`.
-  - Replace any direct `RubyLLM.chat` usage in controllers with `AIService` calls.
-  - Files: `app/services/ai_service.rb`, `app/controllers/ai_messages_controller.rb`, `app/controllers/workout_plans_controller.rb` (revise flow).
-
-- [ ] Improve AI system prompt and persona
-
-  - Expand `config/ai.yml` system prompt to include persona, safety rules, clarifying questions, and structured output guidance.
-  - Ensure `AIConfig.system_prompt` returns the configured prompt.
-
-- [ ] AI-Powered Workout Generator (spec → implementation)
-
-  - Data collection: age, sex, weight, height, fitness goals, exercise preferences, workout history, health considerations.
-  - Data analysis & personalization: recommend exercises, sets/reps/duration, progression and alternatives for equipment levels.
-  - Adaptability: feedback loop to refine plans based on completed workouts and performance metrics.
-  - Integration points: wearable data, external apps (optional).
-  - Files: `app/services/workout_generator_service.rb` (new), updates to `app/services/ai_service.rb`, migrations for user fields, and UI pages for input.
-
-- [ ] Modernize frontend UI
-
-  - Refresh layout and stylesheets; evaluate Tailwind or Bootstrap adoption.
-  - Improve mobile responsiveness and visual polish for core flows (plan creation, workout execution, chat).
-  - Files: `app/views/layouts/application.html.erb`, main CSS/SCSS, `app/javascript/controllers/*`.
-
-- [ ] Continue Phase 1 feature work
-
-  - Verify & tighten `WorkoutExercise` model validations and tests.
-  - Implement dynamic Exercise form UI (Stimulus controller).
-  - Add Workout execution & logging MVP (models/controllers/views/migrations already scaffolded in local WIP).
-  - Onboarding flow & plan templates, Equipment model, Plan revision UI & multi-chat.
-
-- [ ] Monitoring & rate-limiting
-
-  - Track AI usage per user and enforce quotas (e.g., 50/day) with user-facing counters and admin dashboard.
-
-- [x] Pull updates from team repo
-
-  - Merged `team/master` into local `feature/phase-1.3-ai-service` and resolved conflicts. (Completed)
-
-- [x] Persist TODO list to file
-
-  - This file was generated by the assistant to persist the tracked todo list. (Completed)
-
-- [x] Push merged branch to origin
-  - `feature/phase-1.3-ai-service` pushed to `origin` (Completed)
-
-## Dev server preview troubleshooting
-
-- If the inline preview does not appear at `http://localhost:3000`:
-
-  1. Restart the Rails dev server (stop and start):
+2. Run tests (confirm green):
 
 ```bash
-# from project root
+bin/rails test -v
+```
+
+3. Start dev server and open the homepage to sanity-check UI & theme toggle:
+
+```bash
 bin/rails server
+# open http://localhost:3000 and hard refresh (Cmd+Shift+R)
 ```
 
-2. Hard-refresh the browser (Cmd+Shift+R) or clear cache.
-3. Open browser DevTools (Cmd+Option+I) → Console and look for JS errors.
-4. Verify the `plan_revision_preview` turbo frame exists on the chat page and that the "Revise My Plan" button has `data-turbo-frame="plan_revision_preview"`.
-5. Tail the dev log while reproducing the issue to see server-side errors:
+4. If continuing on AI stabilization: run a grep for direct RubyLLM usage and review `AIService` coverage:
 
 ```bash
-tail -f log/development.log
+git grep "RubyLLM" || true
+git grep "Rubyllm" || true
+git grep "with_instructions" || true
 ```
 
-Notes:
+5. If continuing UI work: run a quick smoke check of the homepage and chat pages; open DevTools for style/JS errors.
 
-- I added a Stimulus controller at `app/javascript/controllers/diff_highlight_controller.js`. Importmap loads controllers from `app/javascript/controllers` via `controllers/index.js`, so a server restart + full refresh ensures the controller is picked up in dev.
+## Key Files & Reference 📚
+
+| Category | Files | Purpose |
+|----------|-------|---------|
+| **AI Integration** | `app/services/ai_service.rb` | Central LLM wrapper with retry logic |
+| | `config/ai.yml` | System prompt configuration |
+| | `lib/tasks/ai_audit.rake` | Audit task to detect direct RubyLLM usage |
+| **Theme & UI** | `app/assets/stylesheets/themes/_halfmoon.scss` | CSS variables for light/dark theme |
+| | `app/assets/stylesheets/components/_buttons.scss` | Button styles |
+| | `app/javascript/controllers/theme_controller.js` | Theme toggle Stimulus controller |
+| **Views** | `app/views/pages/home.html.erb` | Halfmoon-inspired homepage |
+| | `app/views/layouts/application.html.erb` | Main layout with navbar |
+| | `app/views/chats/revise_plan_preview.html.erb` | Plan revision preview |
+| **Controllers** | `app/controllers/chats_controller.rb` | Chat & plan revision logic |
+| | `app/controllers/workout_plans_controller.rb` | Plan CRUD |
+| **Tests** | `test/models/workout_exercise_test.rb` | 19 comprehensive validation tests |
+| | `test/services/ai_service_test.rb` | AI service unit tests |
+| **Docs** | `.github/copilot-instructions.md` | Comprehensive AI agent guide |
+| | `TODO.md` | This file (persistent task tracking) |
+| | `IMPLEMENTATION_PLAN.md` | Full Phase 1-3 roadmap |
+
+## Git & Workflow Notes 🔧
+
+**Current branch:** `feature/phase-1.3-ai-service`  
+**Remote:** `origin` = `https://github.com/TechnoVen/fitbuddy-v2.git`
+
+**Common commands:**
+```bash
+# Development
+bin/rails server                    # Start dev server
+bin/rails test -v                   # Run all tests
+bin/rails ai:audit                  # Check for direct RubyLLM usage
+tail -f log/development.log         # Monitor logs
+
+# Database
+bin/rails db:migrate                # Run migrations
+bin/rails db:seed                   # Load demo data (demo@example.com / password)
+bin/rails db:reset                  # Drop, create, migrate, seed
+
+# Git
+git status                          # Check working directory
+git add -A && git commit -m "..."   # Stage and commit
+git push origin feature/phase-1.3-ai-service  # Push to remote
+```
+
+## Known Issues & Gotchas ⚠️
+
+1. **Frontend assets caching** — New Stimulus controllers or SCSS changes require:
+   - Stop the Rails server
+   - Restart: `bin/rails server`
+   - Hard refresh browser: `Cmd+Shift+R` (Mac) or `Ctrl+Shift+R` (Windows)
+
+2. **Theme toggle visibility** — The theme toggle button may not appear immediately; verify:
+   - `theme_controller.js` is loaded (check browser DevTools → Sources)
+   - Button has `data-controller="theme"` and `data-action="click->theme#toggle"`
+
+3. **AI API rate limits** — `AIService` has built-in retry with exponential backoff (2s, 4s, 8s). Set `OPENAI_API_KEY` in `.env` or Rails credentials.
+
+4. **Test database** — Uses fixtures from `test/fixtures/`. Auto-loaded by `test/test_helper.rb`. Tests run in parallel by default.
+
+5. **step_order uniqueness** — Scoped to `workout_plan_id`, not globally unique. See validation tests.
+
+## Resume Checklist (Next Session) ✨
+
+When you return to this project:
+
+1. **Pull latest changes:**
+   ```bash
+   git checkout feature/phase-1.3-ai-service
+   git pull origin feature/phase-1.3-ai-service
+   ```
+
+2. **Verify environment:**
+   ```bash
+   bundle install                   # Update gems if needed
+   bin/rails db:migrate             # Run any new migrations
+   ```
+
+3. **Run tests:**
+   ```bash
+   bin/rails test -v                # Should see 37 runs, 111 assertions, 0 failures
+   ```
+
+4. **Start server & verify UI:**
+   ```bash
+   bin/rails server
+   # Open http://localhost:3000
+   # Test theme toggle (button in navbar)
+   # Try demo login: demo@example.com / password
+   ```
+
+5. **Review this file** — Check "Next Priority Tasks" section above for what to work on next.
 
 ---
 
-If you'd like me to commit this file and create a WIP branch for your local changes before pulling remote updates, say "Commit WIP and pull" and I'll perform the safe commit + rebase sequence.
+**Last updated:** 2025-12-09  
+**Status:** Ready for next development session  
+**Branch state:** All changes committed and pushed to `origin/feature/phase-1.3-ai-service`
